@@ -120,3 +120,10 @@ MIT License
 
 ## 🤝 Contributing
 Contributions are welcome! Feel free to open an issue or submit a pull request.
+
+Contributors:
+
+
+<a href="https://github.com/linjh1118/json_viz/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=linjh1118/json_viz" />
+</a>
