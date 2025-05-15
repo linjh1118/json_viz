@@ -23,7 +23,17 @@ pip install -r requirements.txt
 
 ## 🎮 Usage
 
-### 🔧 Basic Usage
+### 🖥️ Command Line Usage
+
+```bash
+# Basic usage
+python -m src.json_viz assets/data.jsonl
+
+# With more options (not recommanded, cause you can sample or taggle col in html aboved)
+python -m src.json_viz assets/data.jsonl --output assets/data.html --sample 100 --textual-cols question answer --merge-cols image caption --drop-cols metadata timestamp --title "Dataset Visualization"
+```
+
+### 🔧 SDK Usage
 
 ```python
 from json_viz import JsonVisualizer
@@ -47,16 +57,6 @@ JsonVisualizer.visualize(
     drop_cols=["metadata", "timestamp"],  # Columns to exclude
     title="My Dataset Visualization"  # Custom title
 )
-```
-
-### 🖥️ Command Line Usage
-
-```bash
-# Basic usage
-python -m json_viz assets/data.jsonl
-
-# With more options (not recommanded, cause you can sample or taggle col in html aboved)
-python -m json_viz assets/data.jsonl --output data.html --sample 100 --textual-cols question answer --merge-cols image caption --drop-cols metadata timestamp --title "Dataset Visualization"
 ```
 
 ## 🌐 Interactive Web Interface
