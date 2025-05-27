@@ -24,7 +24,7 @@ class JsonVisualizer:
         """Convert image to base64 encoding for embedding in HTML.
         
         Args:
-            image_path_or_sth: Can be a path string, Path object, BytesIO object, or PIL Image
+            image_path_or_sth: Can be a path string, Path object, BytesIO object, PIL Image, or base64 string
             to_base64: Whether to return as base64 (True) or as bytes (False)
         
         Returns:
@@ -34,6 +34,33 @@ class JsonVisualizer:
 
         # Case 1: Path(or url) to the image
         if isinstance(image_path_or_sth, str):
+            # Check if it's already a base64 string
+            if image_path_or_sth.startswith('data:image/'):
+                # Extract base64 part from data URI
+                if ';base64,' in image_path_or_sth:
+                    base64_part = image_path_or_sth.split(';base64,')[1]
+                    if to_base64:
+                        return base64_part
+                    else:
+                        try:
+                            return base64.b64decode(base64_part)
+                        except Exception:
+                            return b''
+                else:
+                    return '' if to_base64 else b''
+            elif len(image_path_or_sth) > 100 and not ('\\' in image_path_or_sth or image_path_or_sth.startswith('http')):
+                # Likely a raw base64 string (heuristic: long string without path separators or http)
+                try:
+                    # Validate it's valid base64
+                    base64.b64decode(image_path_or_sth)
+                    if to_base64:
+                        return image_path_or_sth
+                    else:
+                        return base64.b64decode(image_path_or_sth)
+                except Exception:
+                    # Not valid base64, treat as file path
+                    pass
+            
             if image_path_or_sth.startswith('http://') or image_path_or_sth.startswith('https://'):
                 # Case 2: URL pointing to the image
                 response = requests.get(image_path_or_sth)
@@ -77,13 +104,32 @@ class JsonVisualizer:
         """Convert image to HTML img tag with base64 data URI.
         
         Args:
-            image_path_or_sth: Image path, URL, BytesIO, or PIL Image
+            image_path_or_sth: Image path, URL, BytesIO, PIL Image, or base64 string
             width: Width of displayed image in HTML
             
         Returns:
             HTML img tag with embedded image data
         """
-        if not isinstance(image_path_or_sth, (str, Path, io.BytesIO, Image.Image)) or not image_path_or_sth:
+        if not image_path_or_sth:
+            return '<div class="missing-image">No image available</div>'
+        
+        # Handle case where input is already a base64 string or data URI
+        if isinstance(image_path_or_sth, str):
+            if image_path_or_sth.startswith('data:image/'):
+                # Already a complete data URI
+                return f'<img src="{image_path_or_sth}" width="{width}" alt="Embedded Image">'
+            elif len(image_path_or_sth) > 100 and not ('/' in image_path_or_sth or '\\' in image_path_or_sth or image_path_or_sth.startswith('http')):
+                # Likely a raw base64 string
+                try:
+                    # Validate it's valid base64
+                    base64.b64decode(image_path_or_sth)
+                    return f'<img src="data:image/png;base64,{image_path_or_sth}" width="{width}" alt="Embedded Image">'
+                except Exception:
+                    # Not valid base64, continue with normal processing
+                    pass
+        
+        # For non-string types or strings that don't look like base64
+        if not isinstance(image_path_or_sth, (str, Path, io.BytesIO, Image.Image)):
             return '<div class="missing-image">No image available</div>'
         
         encoded_image = JsonVisualizer.image_to_base64(image_path_or_sth)
