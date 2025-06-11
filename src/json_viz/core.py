@@ -48,7 +48,7 @@ class JsonVisualizer:
                             return b''
                 else:
                     return '' if to_base64 else b''
-            elif len(image_path_or_sth) > 100 and not ('\\' in image_path_or_sth or image_path_or_sth.startswith('http')):
+            elif len(image_path_or_sth) > 100 and not ('/' in image_path_or_sth or '\\' in image_path_or_sth or image_path_or_sth.startswith('http')):
                 # Likely a raw base64 string (heuristic: long string without path separators or http)
                 try:
                     # Validate it's valid base64
