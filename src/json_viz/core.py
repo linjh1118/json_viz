@@ -11,6 +11,43 @@ from typing import List, Dict, Union, Optional, Any
 import argparse
 import os
 
+
+
+def extract_qa_from_sharegpt(item: Dict[str, Any]) -> Dict[str, str]:
+    """
+    从sharegpt格式的数据中提取问题、答案和预测（原始推理过程）
+    
+    Args:
+        item: 包含old_messages和messages的数据项
+        
+    Returns:
+        包含question, answer, raw_thinking, raw_answer的字典
+    """
+    try:
+        question_parts = []
+        question_messages = item['messages'][:-1]
+        for msg in question_messages:
+            if msg.get('content'):
+                question_parts.append(msg['content'])
+        question = '\n'.join(question_parts) if question_parts else ''
+        if len(item['messages']) > 1:
+            answer = item['messages'][-1].get('content', '')
+        else:
+            answer = ''
+        
+        return question, answer
+
+        
+    except Exception as e:
+        # import pdb; pdb.set_trace()
+        print(f"提取QA数据时出错: {e}")
+        return {
+            'question': '',
+            'gt_answer': '',
+            'raw_thinking': '',
+            'raw_answer': ''
+        }
+    
 class JsonVisualizer:
     """A framework for visualizing JSON data as interactive HTML tables with dynamic column toggling."""
     
@@ -112,7 +149,12 @@ class JsonVisualizer:
         """
         if not image_path_or_sth:
             return '<div class="missing-image">No image available</div>'
-        
+        if isinstance(image_path_or_sth, list):
+            if len(image_path_or_sth) > 1:
+                print(f"image_path_or_sth is a list of length {len(image_path_or_sth)}, just take the first one")
+            image_path_or_sth = image_path_or_sth[0]
+            
+                
         # Handle case where input is already a base64 string or data URI
         if isinstance(image_path_or_sth, str):
             if image_path_or_sth.startswith('data:image/'):
@@ -132,6 +174,8 @@ class JsonVisualizer:
         if not isinstance(image_path_or_sth, (str, Path, io.BytesIO, Image.Image)):
             return '<div class="missing-image">No image available</div>'
         
+        # if not os.path.exists(image_path_or_sth):
+        #     import pdb; pdb.set_trace()
         encoded_image = JsonVisualizer.image_to_base64(image_path_or_sth)
         if not encoded_image:
             return '<div class="missing-image">Image not found</div>'
@@ -194,7 +238,6 @@ class JsonVisualizer:
         """
         # Make a copy to avoid modifying the original
         df = df.copy()
-        
         # Default lists if not provided
         if textual_cols is None:
             textual_cols = ['q & a', 'result', 'question', 'answer']
@@ -204,6 +247,8 @@ class JsonVisualizer:
         
         # Convert dictionary/object columns to JSON strings with better formatting
         for col in df.columns:
+            if 'image' in col.lower() or 'graph' in col.lower():
+                continue
             if df[col].apply(lambda x: isinstance(x, (dict, list))).any():
                 df[col] = df[col].apply(lambda x: json.dumps(x, indent=2, ensure_ascii=False).replace('\n', '<br>').replace(' ', '&nbsp;') if isinstance(x, (dict, list)) else x)
         
@@ -577,7 +622,13 @@ class JsonVisualizer:
         df = original_df.copy()
         if sample_size and sample_size < len(df):
             df = df.sample(sample_size, random_state=42)
+        
+        if "messages" in df.columns:
+            # 这是sharegpt格式的，转成QA
+            df['question'] = df.apply(lambda x: extract_qa_from_sharegpt(x)[0], axis=1)
+            df['answer'] = df.apply(lambda x: extract_qa_from_sharegpt(x)[1], axis=1)
             
+        
         # Process the DataFrame
         df = JsonVisualizer.process_dataframe(
             df, 

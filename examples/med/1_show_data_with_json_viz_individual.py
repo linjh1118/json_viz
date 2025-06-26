@@ -66,7 +66,7 @@ def process_sharegpt_messages(messages):
 
 def fix_image_paths(images):
     """修复图片路径，将DATA替换为实际路径"""
-    IMAGE_BASE_PATH = "/mnt/bn/med-mllm-lfv2/linjh/project/med_vlm_rl/DATA"
+    IMAGE_BASE_PATH = "/mnt/bn/med-mllm-lfv2"
     
     if not images:
         return images
