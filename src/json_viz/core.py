@@ -155,7 +155,7 @@ class JsonVisualizer:
             return byte_arr
 
     @staticmethod
-    def image_to_html(image_path_or_sth, width=650):
+    def image_to_html(image_path_or_sth, width=600):
         """Convert image to HTML img tag with base64 data URI.
         
         Args:
@@ -362,7 +362,7 @@ class JsonVisualizer:
             background-color: #f8f9fa;
         }
         .container {
-            max-width: 98%;
+            max-width: 95%;
             margin: 0 auto;
         }
         .controls {
@@ -378,48 +378,27 @@ class JsonVisualizer:
         .data-table {
             width: 100%;
             border-collapse: collapse;
-            table-layout: auto;
         }
         .data-table th {
             background-color: #f8f9fa;
             position: sticky;
             top: 0;
-            z-index: 10;
-            box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            border-bottom: 2px solid #dee2e6;
         }
         .data-table td, .data-table th {
-            padding: 12px;
+            padding: 8px;
             border: 1px solid #dee2e6;
             word-wrap: break-word;
         }
-        .data-table th {
-            min-width: 150px;
-        }
         .data-table td {
             vertical-align: top;
-            max-width: 800px;
-            min-width: 200px;
-        }
-        /* 为图片列设置更大的宽度 */
-        .data-table .image-column {
-            max-width: 1000px !important;
-            min-width: 650px;
-            width: 700px;
-        }
-        /* 为文本列设置更大的宽度 */
-        .data-table .text-column {
-            max-width: 1500px !important;
-            min-width: 500px;
-            width: 600px;
+            max-width: 500px;
         }
         img {
-            max-width: none;
-            width: 650px;
+            max-width: 100%;
             height: auto;
-            display: block;
-            margin: 5px auto;
-            border-radius: 4px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         .hide {
             display: none;
@@ -468,6 +447,10 @@ class JsonVisualizer:
             width: 100px;
             margin-right: 10px;
         }
+        .table-responsive {
+            max-height: 80vh;
+            overflow-y: auto;
+        }
         """
         
         # JavaScript for dynamic column toggling and additional features
@@ -482,51 +465,15 @@ class JsonVisualizer:
                 searching: true,
                 ordering: true,
                 info: true,
-                autoWidth: false,
-                scrollX: true,
                 lengthMenu: [
                     [10, 25, 50, 100, 200, 500, -1],
                     [10, 25, 50, 100, 200, 500, "All"]
                 ],
                 dom: '<"top"lf>rt<"bottom"ip><"clear">',
                 columnDefs: [
-                    { orderable: false, targets: '_all' },
-                    { width: "auto", targets: '_all' }
-                ],
-                drawCallback: function() {
-                    // 每次表格重绘时应用列样式
-                    applyColumnClasses();
-                }
+                    { orderable: false, targets: '_all' }
+                ]
             });
-            
-            // 立即执行一次列类型识别
-            function applyColumnClasses() {
-                // 为包含图片的单元格添加CSS类
-                $('.data-table td').each(function() {
-                    if ($(this).find('img').length > 0) {
-                        $(this).addClass('image-column');
-                    }
-                });
-                
-                // 为文本列添加CSS类
-                $('.data-table th').each(function(index) {
-                    var columnName = $(this).text().toLowerCase();
-                    var isTextColumn = ['question', 'answer', 'result', 'prompt', 'response', 'llm_response',
-                                      'predict', 'judge', 'caption', 'cot', 'claude', 'messages',
-                                      'res', 'parse', 'truth', 'desc', 'info', 'content'].some(function(pattern) {
-                        return columnName.includes(pattern);
-                    });
-                    
-                    if (isTextColumn) {
-                        $('table tbody tr').each(function() {
-                            $(this).find('td').eq(index).addClass('text-column');
-                        });
-                    }
-                });
-            }
-            
-            // 初始化时执行一次
-            applyColumnClasses();
             
             // 添加自定义页面长度输入
             var lengthDiv = $('.dataTables_length');
@@ -578,11 +525,6 @@ class JsonVisualizer:
                         table.clear();
                         table.rows.add(sampledData);
                         table.draw();
-                        
-                        // 重新应用列样式
-                        setTimeout(function() {
-                            applyColumnClasses();
-                        }, 100);
                         
                         // Update row count badge
                         $('.badge.bg-primary').text(size + ' rows');
