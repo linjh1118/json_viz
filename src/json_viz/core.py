@@ -105,11 +105,29 @@ class JsonVisualizer:
                 byte_arr = response.content
             else:
                 # Local file path
+                # try:
+                #     with open(image_path_or_sth, "rb") as image_file:
+                #         byte_arr = image_file.read()
+                # except FileNotFoundError:
+                #     # Return a placeholder image or error message
+                #     byte_arr = b''
                 try:
-                    with open(image_path_or_sth, "rb") as image_file:
-                        byte_arr = image_file.read()
-                except FileNotFoundError:
-                    # Return a placeholder image or error message
+                    from PIL import Image
+                    img = Image.open(image_path_or_sth)
+                    width, height = (256, 256)
+                    # width, height = (600, 600)
+                    if img.width > width or img.height > height:
+                        # 保持图片比例
+                        ratio = min(width/img.width, height/img.height)
+                        new_size = (int(img.width * ratio), int(img.height * ratio))
+                        img = img.resize(new_size, Image.LANCZOS)
+                    
+                    # 保存为PNG格式
+                    buffer = io.BytesIO()
+                    img.save(buffer, format='PNG')
+                    byte_arr = buffer.getvalue()
+                except Exception as e:
+                    print(f"处理图片时出错: {e}")
                     byte_arr = b''
         elif isinstance(image_path_or_sth, Path):
             # Local Path object
@@ -137,7 +155,7 @@ class JsonVisualizer:
             return byte_arr
 
     @staticmethod
-    def image_to_html(image_path_or_sth, width=320):
+    def image_to_html(image_path_or_sth, width=650):
         """Convert image to HTML img tag with base64 data URI.
         
         Args:
@@ -147,6 +165,9 @@ class JsonVisualizer:
         Returns:
             HTML img tag with embedded image data
         """
+        
+        if isinstance(image_path_or_sth, list):
+            image_path_or_sth = image_path_or_sth[0]
         if not image_path_or_sth:
             return '<div class="missing-image">No image available</div>'
         if isinstance(image_path_or_sth, list):
@@ -254,8 +275,11 @@ class JsonVisualizer:
         
         # Process image columns
         for col in df.columns:
-            if 'image' in col.lower() or 'graph' in col.lower():
-                df[col] = df[col].apply(lambda x: JsonVisualizer.image_to_html(x))
+            if 'image' in col.lower() or 'graph' in col.lower() or 'img' in col.lower():
+                if isinstance(df[col].iloc[0], str) and '/' in df[col].iloc[0]:
+                    df[col] = df[col].apply(lambda x: JsonVisualizer.image_to_html(x))
+                if isinstance(df[col].iloc[0], list):
+                    df[col] = df[col].apply(lambda x: JsonVisualizer.image_to_html(x[0]))
         
         # Process text columns
         for col in df.columns:
@@ -263,7 +287,7 @@ class JsonVisualizer:
             is_textual = (col in textual_cols or col.lower() in textual_cols or
                          any(pattern in col.lower() for pattern in 
                              ['result', 'prompt', 'question', 'answer', 'q & a', 
-                              'predict', 'judge', 'caption', 'cot', 'claude', 
+                              'predict', 'judge', 'caption', 'cot', 'claude', "messages"
                               'res', 'parse', 'truth', 'desc', 'info']))
             
             if is_textual:
@@ -338,7 +362,7 @@ class JsonVisualizer:
             background-color: #f8f9fa;
         }
         .container {
-            max-width: 95%;
+            max-width: 98%;
             margin: 0 auto;
         }
         .controls {
@@ -354,6 +378,7 @@ class JsonVisualizer:
         .data-table {
             width: 100%;
             border-collapse: collapse;
+            table-layout: auto;
         }
         .data-table th {
             background-color: #f8f9fa;
@@ -363,17 +388,38 @@ class JsonVisualizer:
             box-shadow: 0 1px 1px rgba(0,0,0,0.1);
         }
         .data-table td, .data-table th {
-            padding: 8px;
+            padding: 12px;
             border: 1px solid #dee2e6;
             word-wrap: break-word;
         }
+        .data-table th {
+            min-width: 150px;
+        }
         .data-table td {
             vertical-align: top;
-            max-width: 500px;
+            max-width: 800px;
+            min-width: 200px;
+        }
+        /* 为图片列设置更大的宽度 */
+        .data-table .image-column {
+            max-width: 1000px !important;
+            min-width: 650px;
+            width: 700px;
+        }
+        /* 为文本列设置更大的宽度 */
+        .data-table .text-column {
+            max-width: 1500px !important;
+            min-width: 500px;
+            width: 600px;
         }
         img {
-            max-width: 100%;
+            max-width: none;
+            width: 650px;
             height: auto;
+            display: block;
+            margin: 5px auto;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         .hide {
             display: none;
@@ -436,15 +482,51 @@ class JsonVisualizer:
                 searching: true,
                 ordering: true,
                 info: true,
+                autoWidth: false,
+                scrollX: true,
                 lengthMenu: [
                     [10, 25, 50, 100, 200, 500, -1],
                     [10, 25, 50, 100, 200, 500, "All"]
                 ],
                 dom: '<"top"lf>rt<"bottom"ip><"clear">',
                 columnDefs: [
-                    { orderable: false, targets: '_all' }
-                ]
+                    { orderable: false, targets: '_all' },
+                    { width: "auto", targets: '_all' }
+                ],
+                drawCallback: function() {
+                    // 每次表格重绘时应用列样式
+                    applyColumnClasses();
+                }
             });
+            
+            // 立即执行一次列类型识别
+            function applyColumnClasses() {
+                // 为包含图片的单元格添加CSS类
+                $('.data-table td').each(function() {
+                    if ($(this).find('img').length > 0) {
+                        $(this).addClass('image-column');
+                    }
+                });
+                
+                // 为文本列添加CSS类
+                $('.data-table th').each(function(index) {
+                    var columnName = $(this).text().toLowerCase();
+                    var isTextColumn = ['question', 'answer', 'result', 'prompt', 'response', 'llm_response',
+                                      'predict', 'judge', 'caption', 'cot', 'claude', 'messages',
+                                      'res', 'parse', 'truth', 'desc', 'info', 'content'].some(function(pattern) {
+                        return columnName.includes(pattern);
+                    });
+                    
+                    if (isTextColumn) {
+                        $('table tbody tr').each(function() {
+                            $(this).find('td').eq(index).addClass('text-column');
+                        });
+                    }
+                });
+            }
+            
+            // 初始化时执行一次
+            applyColumnClasses();
             
             // 添加自定义页面长度输入
             var lengthDiv = $('.dataTables_length');
@@ -496,6 +578,11 @@ class JsonVisualizer:
                         table.clear();
                         table.rows.add(sampledData);
                         table.draw();
+                        
+                        // 重新应用列样式
+                        setTimeout(function() {
+                            applyColumnClasses();
+                        }, 100);
                         
                         // Update row count badge
                         $('.badge.bg-primary').text(size + ' rows');
