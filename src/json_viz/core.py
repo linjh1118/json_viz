@@ -114,8 +114,7 @@ class JsonVisualizer:
                 try:
                     from PIL import Image
                     img = Image.open(image_path_or_sth)
-                    width, height = (256, 256)
-                    # width, height = (600, 600)
+                    width, height = (800, 800)
                     if img.width > width or img.height > height:
                         # 保持图片比例
                         ratio = min(width/img.width, height/img.height)
@@ -155,7 +154,7 @@ class JsonVisualizer:
             return byte_arr
 
     @staticmethod
-    def image_to_html(image_path_or_sth, width=600):
+    def image_to_html(image_path_or_sth, width=700):
         """Convert image to HTML img tag with base64 data URI.
         
         Args:
@@ -362,7 +361,7 @@ class JsonVisualizer:
             background-color: #f8f9fa;
         }
         .container {
-            max-width: 95%;
+            max-width: 98%;
             margin: 0 auto;
         }
         .controls {
@@ -388,13 +387,26 @@ class JsonVisualizer:
             border-bottom: 2px solid #dee2e6;
         }
         .data-table td, .data-table th {
-            padding: 8px;
+            padding: 12px;
             border: 1px solid #dee2e6;
             word-wrap: break-word;
         }
         .data-table td {
             vertical-align: top;
-            max-width: 500px;
+            max-width: 800px;
+            min-width: 120px;
+        }
+        /* 图片列样式 */
+        .image-column {
+            max-width: 800px !important;
+            min-width: 600px !important;
+            width: 700px;
+        }
+        /* 文本列样式 */
+        .text-column {
+            max-width: 1500px !important;
+            min-width: 300px !important;
+            width: 800px;
         }
         img {
             max-width: 100%;
@@ -567,6 +579,48 @@ class JsonVisualizer:
             $('#search').on('keyup', function() {
                 table.search($(this).val()).draw();
             });
+            
+            // 自动检测并应用列类型样式
+            function applyColumnStyles() {
+                var table = $('.data-table');
+                var headers = table.find('th');
+                
+                headers.each(function(index) {
+                    var columnName = $(this).text().toLowerCase();
+                    var columnIndex = index;
+                    
+                    // 检测图片列
+                    if (columnName.includes('image') || columnName.includes('img') || 
+                        columnName.includes('picture') || columnName.includes('photo') || 
+                        columnName.includes('图片') || columnName.includes('图像')) {
+                        
+                        // 为表头添加类
+                        $(this).addClass('image-column');
+                        
+                        // 为对应的数据列添加类
+                        table.find('td:nth-child(' + (columnIndex + 1) + ')').addClass('image-column');
+                    }
+                    
+                    // 检测文本列
+                    else if (columnName.includes('question') || columnName.includes('answer') || 
+                             columnName.includes('text') || columnName.includes('content') || 
+                             columnName.includes('prompt') || columnName.includes('response') || 
+                             columnName.includes('result') || columnName.includes('thinking') ||
+                             columnName.includes('问题') || columnName.includes('答案') || 
+                             columnName.includes('回答') || columnName.includes('内容') ||
+                             columnName.includes('llm_response') || columnName.includes('llm')) {
+                        
+                        // 为表头添加类
+                        $(this).addClass('text-column');
+                        
+                        // 为对应的数据列添加类
+                        table.find('td:nth-child(' + (columnIndex + 1) + ')').addClass('text-column');
+                    }
+                });
+            }
+            
+            // 应用列样式
+            applyColumnStyles();
         });
         """
         
