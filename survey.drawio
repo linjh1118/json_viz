@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0" version="28.0.7" pages="2">
   <diagram name="第 1 页" id="TokMFFgQYcT2cQF_3BuZ">
-    <mxGraphModel dx="593" dy="828" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1186" dy="1656" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -373,8 +373,48 @@
         <mxCell id="O0spg2tH_KgzGL2bhYsA-106" value="Constructing and Evaluating Declarative RAG Pipelines in PyTerrier" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="2785" y="963" width="230" height="51" as="geometry" />
         </mxCell>
-        <mxCell id="O0spg2tH_KgzGL2bhYsA-107" value="Text" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
-          <mxGeometry x="1065" y="1298" width="50" height="30" as="geometry" />
+        <mxCell id="rTSjoi7EisL_niVAeOhc-3" value="" style="endArrow=classic;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;curved=1;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="120" y="1320" as="sourcePoint" />
+            <mxPoint x="1110" y="640" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="1111" y="1321" />
+              <mxPoint x="1111" y="640" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rTSjoi7EisL_niVAeOhc-4" value="2025.04" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=23;" vertex="1" connectable="0" parent="rTSjoi7EisL_niVAeOhc-3">
+          <mxGeometry x="-0.6698" y="18" relative="1" as="geometry">
+            <mxPoint x="242" y="-48" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rTSjoi7EisL_niVAeOhc-8" value="2025.05" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=23;" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="598" y="1375" as="geometry">
+            <mxPoint x="177" y="-174" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rTSjoi7EisL_niVAeOhc-9" value="2025.06" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=23;" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="910" y="1120" as="geometry" />
+        </mxCell>
+        <mxCell id="rTSjoi7EisL_niVAeOhc-10" value="2025.03" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=23;" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="531" y="1299" as="geometry">
+            <mxPoint x="-61" y="-4" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rTSjoi7EisL_niVAeOhc-11" value="2025.07" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=23;" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="1000" y="1022" as="geometry">
+            <mxPoint x="7" y="-8" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rTSjoi7EisL_niVAeOhc-12" value="2025.08" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=23;" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="1082" y="886" as="geometry">
+            <mxPoint x="-13" y="-4" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rTSjoi7EisL_niVAeOhc-13" value="2024-2025.02" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=23;" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="342" y="1318.5" as="geometry">
+            <mxPoint x="-61" y="-4" as="offset" />
+          </mxGeometry>
         </mxCell>
       </root>
     </mxGraphModel>
