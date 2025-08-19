@@ -44,7 +44,7 @@
           <mxGeometry x="44" y="40" width="60" height="30" as="geometry" />
         </mxCell>
         <mxCell id="jqLesSeV2rO2w_mfBGBV-17" value="Entropy" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=light-dark(#827879, #ededed);fontSize=20;textDirection=vertical-rl;rotation=-180;" parent="1" vertex="1">
-          <mxGeometry x="-780" y="320" width="60" height="30" as="geometry" />
+          <mxGeometry x="-747" y="302.1" width="30" height="90" as="geometry" />
         </mxCell>
         <mxCell id="jqLesSeV2rO2w_mfBGBV-18" value="Step" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=light-dark(#827879, #ededed);fontSize=18;" parent="1" vertex="1">
           <mxGeometry x="-417" y="544.2" width="60" height="30" as="geometry" />
